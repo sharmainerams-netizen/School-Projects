@@ -1,8 +1,3 @@
-//25806947
-//Tshegofatso
-//Ramonyai
-// Please Note: AI~ChatGPT 4 and YouTube was consulted to better understand the pseudocode , help with refining the overall structure (especailly with the two classes) as well as logic. .
-
 #include <iostream>
 #include <stack>
 #include<queue>
