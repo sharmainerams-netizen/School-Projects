@@ -1,0 +1,228 @@
+//25806947
+//Tshegofatso
+//Ramonyai
+// Please Note: AI~ChatGPT 4 and YouTube was consulted to better understand the pseudocode , help with refining the overall structure (especailly with the two classes) as well as logic. .
+
+#include <iostream>
+#include <stack>
+#include<queue>
+#include<vector>
+#include<string>
+
+using namespace std;
+
+//The queues will store elements of type Order.
+class Order{
+public:
+	char type;
+	int processing_time;
+	
+};
+
+//This will be for display at the end with the complete logs and their time steps.
+class OrderEntry{
+public:
+	int time_step;
+	char order_type;
+	int processing_time;
+
+
+
+};
+// Function displays the contents of the queues.
+void displayQueues(queue< Order > q)
+{
+		if (q.empty()) 
+		{
+			return;
+		}
+
+		while (!q.empty()) {
+
+			// we need to access the front element of the queue first.
+			Order current = q.front();
+
+			cout << "[" << current.type<< ":" << current.processing_time << "] ";
+
+			q.pop();
+		}
+	}
+//Function displays the contents of the stack
+void displayTruckStack(stack<string> s) {
+
+	if (s.empty()) 
+	{
+		cout << "Stack: empty";
+	}
+
+	//display the stack from top to bottom.
+	while (!s.empty()) 
+	{
+		cout << s.top() << " ";
+		s.pop();
+	}
+}
+
+
+int main() {
+
+	int time_steps = 30, truck_capacity = 5;
+	char order_types [] = {'S', 'M', 'B'};
+
+	queue< Order > Queue_S;
+	queue< Order > Queue_M;
+	queue< Order > Queue_B;
+
+	stack< string >Truck_Stack;
+
+	int truck_counterS = 0, truck_counterM = 0, truck_counterB = 0;
+
+	int processed_S = 0, processed_M = 0, processed_B = 0;
+
+	int num_orders = 0, process_time = 0;
+
+	char type_order;
+
+	vector< OrderEntry > OrderLog;
+
+	// we will start by iterating through the time steps and geneate new orders
+	for (int t = 1; t <= time_steps; t++) {
+
+		num_orders = rand() % 4; // 0 to 3 new orders 
+		vector<char> new_orders;
+
+
+		for (int i = 1; i <= num_orders; i++) {
+
+			type_order = order_types[rand() % 3];
+			process_time = (rand() % 4) + 1; // time between 1 and 4
+
+			// create an Order object which will be added to the respective queue
+			Order newOrder;
+			newOrder.type = type_order;
+			newOrder.processing_time = process_time;
+
+
+			if (type_order == 'S') {
+				Queue_S.push(newOrder);
+			}
+			else if (type_order == 'M') {
+				Queue_M.push(newOrder);
+			}
+			else if (type_order == 'B') {
+				Queue_B.push(newOrder);
+			}
+
+	
+			new_orders.push_back(type_order);
+
+			//store the generated order in the log for display at the end
+			OrderLog.push_back({ t,type_order, process_time });
+		}
+
+		string push_to_stack = "";
+		// Process the orders in the each queue.
+		if (!Queue_S.empty()) 
+		{
+			Queue_S.front().processing_time--;
+
+			if (Queue_S.front().processing_time <= 0) 
+			{
+				Queue_S.pop();
+				processed_S++;
+
+				if (processed_S >= truck_capacity)
+				{
+					truck_counterS++;
+					push_to_stack = "Truck" + to_string(truck_counterS) + "[S]";
+					Truck_Stack.push(push_to_stack);
+					processed_S = 0;
+				}
+			} 
+		}
+
+		if (!Queue_M.empty())
+		{
+			Queue_M.front().processing_time--;
+
+			if (Queue_M.front().processing_time <= 0) 
+			{
+				Queue_M.pop();
+				processed_M++;
+
+				if (processed_M >= truck_capacity) 
+				{
+					truck_counterM++;
+					push_to_stack = "Truck" + to_string(truck_counterM) + "[M]";
+					Truck_Stack.push(push_to_stack);
+					processed_M = 0;
+				}
+			} 
+		}
+
+		if (!Queue_B.empty())
+		{
+			Queue_B.front().processing_time--;
+
+			if (Queue_B.front().processing_time <= 0)
+			{
+				Queue_B.pop();
+				processed_B++;
+
+				if (processed_B >= truck_capacity)
+				{
+					truck_counterB++;
+					push_to_stack = "Truck" + to_string(truck_counterB) + "[B]";
+					Truck_Stack.push(push_to_stack);
+					processed_B = 0;
+				}
+			} 
+		}
+
+		//Display the current state of the system at each time step
+
+		cout << "Time Step: " << t << endl << endl;
+
+		cout << "New Orders: ";
+
+		if (new_orders.empty()) {
+			cout << "None";
+		}
+		else {
+			for (char c : new_orders)
+			{
+				cout << c << " ";
+			}
+		}
+
+		cout << endl;
+		cout << "Queue S: ";
+		displayQueues(Queue_S);
+		cout << endl;
+
+		cout << "Queue M: ";
+		displayQueues(Queue_M);
+		cout << endl;
+
+		cout << "Queue B: ";
+		displayQueues(Queue_B);
+		cout << endl;
+
+		displayTruckStack(Truck_Stack);
+		cout << endl << endl;
+
+	}
+
+	//display the complete log of generated orders at the end of the simulation
+
+	cout << "Generated Orders(time_step, type, processing_time):" << endl;
+	for (const auto& order : OrderLog) {
+
+		cout << order.time_step << ", "
+			<< order.order_type << ", "
+			<< order.processing_time << endl;
+	}
+
+
+	return 0;
+}
